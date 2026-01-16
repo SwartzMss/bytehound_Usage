@@ -18,7 +18,6 @@ cargo install -f wasm-pack # 如尚未安装且提示缺失时（可选）
 # 确保已装 Yarn（推荐 corepack）：corepack enable && corepack prepare yarn@1.22.22 --activate && hash -r && yarn --version
 cargo build --release
 ```
-常用产物：`target/release/libbytehound.so`（注入库）、`target/release/bytehound`（查看工具，取代旧版 `bh_viewer`）。新版已整合，无需指定单独 package。
 
 ## 核心组件作用
 - `bytehound-preload`（生成 `libbytehound.so`）：通过 `LD_PRELOAD` 劫持 `malloc/free` 等分配接口，把分配事件写到采集输出（本指南用一体化模式写入 `.data`）。
