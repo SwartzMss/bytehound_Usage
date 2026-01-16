@@ -40,7 +40,7 @@ BYTEHOUND_OUT=/tmp/bh.data \
 - `examples/slow_leak`：缓慢泄漏型场景，方便观察持续增长的内存占用（C）。
 
 ## 如何运行示例（配合 Bytehound，C 版本）
-假设 Bytehound 编译产物在 `/path/to/bytehound/target/release`。每个示例目录自带 `Makefile`，默认 `gcc -O0 -g`。示例使用一体化模式，直接生成 `.data`。
+假设 Bytehound 编译产物在 `/path/to/bytehound/target/release`。每个示例目录自带 `Makefile`，默认 `gcc -O0 -g`。示例运行后直接生成 `.data`。
 
 ```bash
 cd examples/alloc_spike
