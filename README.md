@@ -25,7 +25,7 @@ cargo build --release
 
 ## 基本用法
 - 适合单进程、临时分析、快速定位。
-- 被测进程退出后生成一个 `.data`，无需单独启动 Agent。
+- 被测进程退出后生成一个 `.data`。
 ```bash
 LD_PRELOAD=/path/to/libbytehound.so \
 BYTEHOUND_OUT=/tmp/bh.data \
