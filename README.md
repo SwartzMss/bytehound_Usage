@@ -43,14 +43,17 @@ MEMORY_PROFILER_OUTPUT=/tmp/bh.data \
 
 ## 调试符号（强烈建议保留）
 - Bytehound 不依赖符号也能采集，但没有符号 UI 里只会显示地址（分析效率极低）。
-- 为了在 UI 里直接看到函数名/文件/行号，建议使用分离调试符号：
+- 最简单：直接编译带 `-g`，保留符号即可：
   ```bash
   gcc -g -O2 main.c -o app
-  objcopy --only-keep-debug app app.debug
-  strip --strip-debug app
-  objcopy --add-gnu-debuglink=app.debug app
   ```
-  - `app`：可运行的精简二进制
+- 如果想把符号单独存放，可以额外生成一个调试符号文件（可选）：
+  ```bash
+  objcopy --only-keep-debug app app.debug
+  # 需要瘦身再 strip 主程序时，再配合 --add-gnu-debuglink 标记符号文件：
+  # strip --strip-debug app
+  # objcopy --add-gnu-debuglink=app.debug app
+  ```
   - `app.debug`：符号/行号文件，UI 可直接解析出栈帧信息
 - 查看时用 `-d` 指向符号目录或符号文件所在位置，例如 `/path/to/bytehound server data.dat --port 1789 -d /path/to/debug-symbols`。
 
