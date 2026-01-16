@@ -37,10 +37,9 @@ BYTEHOUND_OUT=/tmp/bh.data \
 
 ## 仓库结构
 - `examples/alloc_spike`：周期性大额分配/释放，方便观察瞬时内存峰值（C）。
-- `examples/slow_leak`：缓慢泄漏型场景，方便观察持续增长的内存占用（C）。
 
 ## 如何运行示例（配合 Bytehound，C 版本）
-假设 Bytehound 编译产物在 `/path/to/bytehound/target/release`。每个示例目录自带 `Makefile`，默认 `gcc -O0 -g`。示例运行后直接生成 `.data`。
+假设 Bytehound 编译产物在 `/path/to/bytehound/target/release`。示例目录自带 `Makefile`，默认 `gcc -O0 -g`。示例运行后直接生成 `.data`。
 
 ```bash
 cd examples/alloc_spike
@@ -50,16 +49,8 @@ LD_PRELOAD=/path/to/bytehound/target/release/libbytehound.so \
 BYTEHOUND_OUT=../../recordings/alloc_spike.data \
 ./alloc_spike
 
-# （或）另一个示例：慢速泄漏
-cd ../slow_leak
-make
-LD_PRELOAD=/path/to/bytehound/target/release/libbytehound.so \
-BYTEHOUND_OUT=../../recordings/slow_leak.data \
-./slow_leak
-
 # 采集完成后查看
 /path/to/bytehound/target/release/bytehound --input ../../recordings/alloc_spike.data --listen 127.0.0.1:1789
-/path/to/bytehound/target/release/bytehound --input ../../recordings/slow_leak.data --listen 127.0.0.1:1789
 ```
 
 ## 典型排查思路
