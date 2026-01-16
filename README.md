@@ -50,6 +50,7 @@ LD_PRELOAD=/path/to/bytehound/target/release/libbytehound.so \
 BYTEHOUND_OUT=../../recordings/alloc_spike.data \
 ./alloc_spike
 
+# （或）另一个示例：慢速泄漏
 cd ../slow_leak
 make
 LD_PRELOAD=/path/to/bytehound/target/release/libbytehound.so \
