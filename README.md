@@ -23,7 +23,7 @@ cargo build --release
 - `bytehound-preload`（生成 `libbytehound.so`）：通过 `LD_PRELOAD` 劫持 `malloc/free` 等分配接口，把分配事件写到采集输出。
 - `bytehound`：查看/分析工具，读取录制文件并提供 Web UI。
 
-## 最简单的一体化用法（推荐起步）
+## 基本用法
 - 适合单进程、临时分析、快速定位。
 - 被测进程退出后生成一个 `.data`，无需单独启动 Agent。
 ```bash
