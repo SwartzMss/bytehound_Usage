@@ -36,6 +36,7 @@ MEMORY_PROFILER_OUTPUT=/tmp/bh.data \
 # 如端口冲突，调整为其他端口（例如 8087）：/path/to/bytehound server /tmp/bh.data --port 8087 -d /path/to/debug-symbols
 ```
 - 如果不指定 `MEMORY_PROFILER_OUTPUT`，默认会生成类似 `memory-profiling_%e_%t_%p.dat` 的文件名。
+- 如果数据文件过大，可用精简工具：`/path/to/bytehound strip --output data_file.stripped data_file`，会去掉部分元数据以减小体积，通常用于归档或传输。
 
 ## 仓库结构
 - `examples/alloc_spike`：周期性大额分配/释放，方便观察瞬时内存峰值（C）。
