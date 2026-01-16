@@ -32,8 +32,8 @@ MEMORY_PROFILER_OUTPUT=/tmp/bh.data \
 ./your_program
 
 # 查看
-/path/to/bytehound server /tmp/bh.data --port 1789
-# 如端口冲突，调整为其他端口（例如 8087）：/path/to/bytehound server /tmp/bh.data --port 8087
+/path/to/bytehound server /tmp/bh.data --port 1789 -d /path/to/debug-symbols
+# 如端口冲突，调整为其他端口（例如 8087）：/path/to/bytehound server /tmp/bh.data --port 8087 -d /path/to/debug-symbols
 ```
 - 如果不指定 `MEMORY_PROFILER_OUTPUT`，默认会生成类似 `memory-profiling_%e_%t_%p.dat` 的文件名。
 
@@ -52,6 +52,7 @@ MEMORY_PROFILER_OUTPUT=/tmp/bh.data \
   ```
   - `app`：可运行的精简二进制
   - `app.debug`：符号/行号文件，UI 可直接解析出栈帧信息
+- 查看时用 `-d` 指向符号目录或符号文件所在位置，例如 `/path/to/bytehound server data.dat --port 1789 -d /path/to/debug-symbols`。
 
 ## 如何运行示例（配合 Bytehound，C 版本）
 假设 Bytehound 编译产物在 `/path/to/bytehound/target/release`。示例目录自带 `Makefile`，默认 `gcc -O0 -g`。示例运行后直接生成 `.data`。
@@ -65,7 +66,7 @@ MEMORY_PROFILER_OUTPUT=../../recordings/alloc_spike.data \
 ./alloc_spike
 
 # 采集完成后查看
-/path/to/bytehound/target/release/bytehound server ../../recordings/alloc_spike.data --port 1789
+/path/to/bytehound/target/release/bytehound server ../../recordings/alloc_spike.data --port 1789 -d /path/to/debug-symbols
 ```
 
 ## 典型排查思路
