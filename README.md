@@ -6,90 +6,61 @@
 - Linux x86_64（Bytehound 目前仅支持 Linux）
 - 已安装 Rust/Cargo（建议 1.72+）
 - 能从源码编译 Bytehound（官方仓库），需要 `cmake` 等基础构建工具
+- Node.js + Yarn（构建 WebUI 时需要 Yarn，否则编译会失败）
 
 ## 编译 Bytehound
-> 具体参数可能随版本变化，请以 `bh_agent --help` / `bh_viewer --help` 为准。
+> 具体参数可能随版本变化，请以官方 README 为准。
 
 ```bash
 git clone https://github.com/koute/bytehound.git
 cd bytehound
-cargo build --release -p bh_agent -p bytehound-preload -p bh_viewer
+cargo install -f wasm-pack # 如尚未安装且提示缺失时（可选）
+# 确保已装 Yarn：sudo apt update && sudo apt install yarn  或  npm install -g yarn
+cargo build --release
 ```
-编译产物：`target/release/bh_agent`、`target/release/libbytehound.so`、`target/release/bh_viewer`。
+常用产物：`target/release/libbytehound.so`（注入库）、`target/release/bh_viewer`（查看工具）。新版已整合，无需指定单独 package。
 
 ## 核心组件作用
-- `bytehound-preload`（生成 `libbytehound.so`）：通过 `LD_PRELOAD` 劫持 `malloc/free` 等分配接口，把分配事件上报给 Agent。没有它就无法捕获目标进程的内存分配。
-- `bh_agent`：采集和记录服务，接收来自被测进程的分配数据并写出录制文件。没有它就无法收集或保存数据。
-- `bh_viewer`：本地 Web UI 分析器，读取录制文件并提供交互视图。没有它就不能可视化分析采集结果。
+- `bytehound-preload`（生成 `libbytehound.so`）：通过 `LD_PRELOAD` 劫持 `malloc/free` 等分配接口，把分配事件写到采集输出（本指南用一体化模式写入 `.data`）。
+- `bh_viewer`：本地 Web UI 分析器，读取录制文件并提供交互视图。
+- `bh_agent`：分离式 Agent 模式的采集服务端（本指南未使用，如需多进程/长时采集可参考官方文档）。
 
-## 运行模式
-### 一体化模式（最简单）
-- 适合单进程、临时分析、新手快速定位。
-- 直接运行，被测进程退出后生成一个 `.data`。
+## 最简单的一体化用法（推荐起步）
+- 适合单进程、临时分析、快速定位。
+- 被测进程退出后生成一个 `.data`，无需单独启动 Agent。
 ```bash
 LD_PRELOAD=/path/to/libbytehound.so \
 BYTEHOUND_OUT=/tmp/bh.data \
 ./your_program
 
 # 查看
-bh_viewer --input /tmp/bh.data --listen 127.0.0.1:1789
+/path/to/bh_viewer --input /tmp/bh.data --listen 127.0.0.1:1789
 ```
-
-### 分离式 Agent 模式（多进程/长时场景）
-- Agent 常驻，可同时采集多个进程，数据结构化保存在 `--recordings`。
-- 适合长跑服务、多 worker、压测/线上复现。
-```bash
-# 1) 启动 Agent
-bh_agent server --ipc /tmp/bytehound.sock --recordings ./recordings
-
-# 2) 被测进程用 LD_PRELOAD 注入并连到 Agent
-BYTEHOUND_SERVER=ipc:///tmp/bytehound.sock \
-LD_PRELOAD=/path/to/libbytehound.so \
-./your_program
-
-# 3) 查看
-bh_viewer --input recordings/<录制文件> --listen 127.0.0.1:1789
-```
-
-## Agent 关键参数（工程语义）
-- `bh_agent server`：启动采集服务端，等待 `bytehound-preload.so` 连接，相当于先开“内存事件收集中心”。
-- `--ipc /tmp/bytehound.sock`：使用 Unix Domain Socket 做进程间通信，preload 通过此 socket 把事件发给 Agent。本地、快速、可控。
-- `--recordings ./recordings`：采集数据写入该目录。一次采集一个子目录，如：
-  ```
-  recordings/
-   └─ recording-2026-01-16T12-00-01/
-        ├─ allocations.bin
-        ├─ stacks.bin
-        └─ meta.json
-  ```
-  这些是原始采集数据，后续交给 `bh_viewer` 查看。
 
 ## 仓库结构
 - `examples/alloc_spike`：周期性大额分配/释放，方便观察瞬时内存峰值（C）。
 - `examples/slow_leak`：缓慢泄漏型场景，方便观察持续增长的内存占用（C）。
 
 ## 如何运行示例（配合 Bytehound，C 版本）
-假设 Bytehound 编译产物在 `/path/to/bytehound/target/release`。每个示例目录自带 `Makefile`，默认 `gcc -O0 -g`。
+假设 Bytehound 编译产物在 `/path/to/bytehound/target/release`。每个示例目录自带 `Makefile`，默认 `gcc -O0 -g`。示例使用一体化模式，直接生成 `.data`。
 
 ```bash
-# 终端 1：启动 Agent
-/path/to/bytehound/target/release/bh_agent server --ipc /tmp/bytehound.sock --recordings ./recordings
-
-# 终端 2：编译 + 运行示例（选择其一）
 cd examples/alloc_spike
 make
-BYTEHOUND_SERVER=ipc:///tmp/bytehound.sock \
+mkdir -p ../../recordings
 LD_PRELOAD=/path/to/bytehound/target/release/libbytehound.so \
+BYTEHOUND_OUT=../../recordings/alloc_spike.data \
 ./alloc_spike
 
 cd ../slow_leak
 make
-BYTEHOUND_SERVER=ipc:///tmp/bytehound.sock \
 LD_PRELOAD=/path/to/bytehound/target/release/libbytehound.so \
+BYTEHOUND_OUT=../../recordings/slow_leak.data \
 ./slow_leak
 
 # 采集完成后查看
-/path/to/bytehound/target/release/bh_viewer --input recordings/<录制文件> --listen 127.0.0.1:1789
+/path/to/bytehound/target/release/bh_viewer --input ../../recordings/alloc_spike.data --listen 127.0.0.1:1789
+/path/to/bytehound/target/release/bh_viewer --input ../../recordings/slow_leak.data --listen 127.0.0.1:1789
 ```
 
 ## 典型排查思路
