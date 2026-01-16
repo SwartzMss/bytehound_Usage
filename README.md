@@ -15,7 +15,7 @@
 git clone https://github.com/koute/bytehound.git
 cd bytehound
 cargo install -f wasm-pack # 如尚未安装且提示缺失时（可选）
-# 确保已装 Yarn：sudo apt update && sudo apt install yarn  或  npm install -g yarn
+# 确保已装 Yarn（推荐 corepack）：corepack enable && corepack prepare yarn@1.22.22 --activate && hash -r && yarn --version
 cargo build --release
 ```
 常用产物：`target/release/libbytehound.so`（注入库）、`target/release/bh_viewer`（查看工具）。新版已整合，无需指定单独 package。
