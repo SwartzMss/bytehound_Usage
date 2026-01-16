@@ -20,7 +20,7 @@ cargo build --release
 ```
 
 ## 核心组件作用
-- `bytehound-preload`（生成 `libbytehound.so`）：通过 `LD_PRELOAD` 劫持 `malloc/free` 等分配接口，把分配事件写到采集输出（本指南用一体化模式写入 `.data`）。
+- `bytehound-preload`（生成 `libbytehound.so`）：通过 `LD_PRELOAD` 劫持 `malloc/free` 等分配接口，把分配事件写到采集输出。
 - `bytehound`：查看/分析工具，读取录制文件并提供 Web UI。
 
 ## 最简单的一体化用法（推荐起步）
