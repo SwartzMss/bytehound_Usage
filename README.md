@@ -28,12 +28,13 @@ cargo build --release
 - 被测进程退出后生成一个 `.data`。
 ```bash
 LD_PRELOAD=/path/to/libbytehound.so \
-BYTEHOUND_OUT=/tmp/bh.data \
+MEMORY_PROFILER_OUTPUT=/tmp/bh.data \
 ./your_program
 
 # 查看
 /path/to/bytehound --input /tmp/bh.data --listen 127.0.0.1:1789
 ```
+- 如果不指定 `MEMORY_PROFILER_OUTPUT`，默认会生成类似 `memory-profiling_%e_%t_%p.dat` 的文件名。
 
 ## 仓库结构
 - `examples/alloc_spike`：周期性大额分配/释放，方便观察瞬时内存峰值（C）。
@@ -47,7 +48,7 @@ cd examples/alloc_spike
 make
 mkdir -p ../../recordings
 LD_PRELOAD=/path/to/bytehound/target/release/libbytehound.so \
-BYTEHOUND_OUT=../../recordings/alloc_spike.data \
+MEMORY_PROFILER_OUTPUT=../../recordings/alloc_spike.data \
 ./alloc_spike
 
 # 采集完成后查看
