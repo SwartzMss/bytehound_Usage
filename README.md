@@ -22,7 +22,7 @@ cargo build --release
 
 ## 核心组件作用
 - `bytehound-preload`（生成 `libbytehound.so`）：通过 `LD_PRELOAD` 劫持 `malloc/free` 等分配接口，把分配事件写到采集输出（本指南用一体化模式写入 `.data`）。
-- `bh_viewer`：本地 Web UI 分析器，读取录制文件并提供交互视图。
+- `bytehound`：新版查看/分析工具（取代旧版 `bh_viewer`），读取录制文件并提供 Web UI。
 - `bh_agent`：分离式 Agent 模式的采集服务端（本指南未使用，如需多进程/长时采集可参考官方文档）。
 
 ## 最简单的一体化用法（推荐起步）
