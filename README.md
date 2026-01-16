@@ -27,13 +27,11 @@ cargo build --release
 - 适合单进程、临时分析、快速定位。
 - 被测进程退出后生成一个 `.data`。
 ```bash
-LD_PRELOAD=/path/to/libbytehound.so \
-MEMORY_PROFILER_OUTPUT=/tmp/bh.data \
-./your_program
+LD_PRELOAD=/path/to/libbytehound.so ./your_program
 
-# 查看
-/path/to/bytehound server /tmp/bh.data --port 1789 -d /path/to/debug-symbols
-# 如端口冲突，调整为其他端口（例如 8087）：/path/to/bytehound server /tmp/bh.data --port 8087 -d /path/to/debug-symbols
+# 查看（把 <generated-file> 换成实际生成的文件名，默认在当前目录且形如 memory-profiling_<exe>_<time>_<pid>.dat）
+/path/to/bytehound server <generated-file> --port 1789 -d /path/to/debug-symbols
+# 如端口冲突，调整为其他端口（例如 8087）：/path/to/bytehound server <generated-file> --port 8087 -d /path/to/debug-symbols
 ```
 - 如果不指定 `MEMORY_PROFILER_OUTPUT`，默认会生成类似 `memory-profiling_%e_%t_%p.dat` 的文件名。
 - 如果数据文件过大，可用精简工具：`/path/to/bytehound strip --output data_file.stripped data_file`，会去掉部分元数据以减小体积，通常用于归档或传输。
@@ -66,11 +64,10 @@ cd examples/alloc_spike
 make
 mkdir -p ../../recordings
 LD_PRELOAD=/path/to/bytehound/target/release/libbytehound.so \
-MEMORY_PROFILER_OUTPUT=../../recordings/alloc_spike.data \
 ./alloc_spike
 
-# 采集完成后查看
-/path/to/bytehound/target/release/bytehound server ../../recordings/alloc_spike.data --port 1789 -d /path/to/debug-symbols
+# 采集完成后会在当前目录生成 memory-profiling_alloc_spike_<time>_<pid>.dat，替换成实际文件名即可查看
+/path/to/bytehound/target/release/bytehound server ./memory-profiling_alloc_spike_<time>_<pid>.dat --port 1789 -d /path/to/debug-symbols
 ```
 
 ## 典型排查思路
