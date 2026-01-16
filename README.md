@@ -32,7 +32,8 @@ MEMORY_PROFILER_OUTPUT=/tmp/bh.data \
 ./your_program
 
 # 查看
-/path/to/bytehound --input /tmp/bh.data --listen 127.0.0.1:1789
+/path/to/bytehound server /tmp/bh.data --port 1789
+# 如端口冲突，调整为其他端口（例如 8087）：/path/to/bytehound server /tmp/bh.data --port 8087
 ```
 - 如果不指定 `MEMORY_PROFILER_OUTPUT`，默认会生成类似 `memory-profiling_%e_%t_%p.dat` 的文件名。
 
@@ -52,7 +53,7 @@ MEMORY_PROFILER_OUTPUT=../../recordings/alloc_spike.data \
 ./alloc_spike
 
 # 采集完成后查看
-/path/to/bytehound/target/release/bytehound --input ../../recordings/alloc_spike.data --listen 127.0.0.1:1789
+/path/to/bytehound/target/release/bytehound server ../../recordings/alloc_spike.data --port 1789
 ```
 
 ## 典型排查思路
